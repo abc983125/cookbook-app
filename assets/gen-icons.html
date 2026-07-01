@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html><body>
+<canvas id="c" width="192" height="192"></canvas>
+<script>
+const c = document.getElementById("c").getContext("2d");
+const g = c.createLinearGradient(0,0,192,192);
+g.addColorStop(0,"#f472b6"); g.addColorStop(1,"#a855f7");
+c.fillStyle = g;
+c.beginPath(); c.roundRect(0,0,192,192,40); c.fill();
+c.font = "100px sans-serif"; c.textAlign = "center"; c.textBaseline = "middle";
+c.fillStyle = "#fff"; c.fillText("👩‍🍳",96,110);
+c.font = "28px sans-serif"; c.fillText("✦",96,55);
+// Download
+const a = document.createElement("a");
+a.download = "icon-192.png";
+a.href = document.getElementById("c").toDataURL("image/png");
+a.click();
+const c2 = document.createElement("canvas"); c2.width=512; c2.height=512;
+const ctx = c2.getContext("2d");
+const g2 = ctx.createLinearGradient(0,0,512,512);
+g2.addColorStop(0,"#f472b6"); g2.addColorStop(1,"#a855f7");
+ctx.fillStyle = g2;
+ctx.beginPath(); ctx.roundRect(0,0,512,512,100); ctx.fill();
+ctx.font = "280px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+ctx.fillStyle = "#fff"; ctx.fillText("👩‍🍳",256,300);
+ctx.font = "80px sans-serif"; ctx.fillText("✦",256,130);
+const a2 = document.createElement("a");
+a2.download = "icon-512.png";
+a2.href = c2.toDataURL("image/png");
+a2.click();
+</script></body></html>
