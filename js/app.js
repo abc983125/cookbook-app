@@ -450,3 +450,59 @@ async function loadSharedData() {
 updateCoinDisplay(); updateDailyRec(); renderCategories(); showRatingHistory();
 loadSharedData();
 
+
+// ===== 自动版本检测 & 实时更新 =====
+const APP_VERSION_KEY = "xs_app_version";
+const CURRENT_VERSION = "2.0.0";
+
+async function checkForUpdate() {
+  try {
+    const resp = await fetch("version.json?_t=" + Date.now());
+    if (!resp.ok) return;
+    const v = await resp.json();
+    if (v.version && v.version !== localStorage.getItem(APP_VERSION_KEY)) {
+      console.log("🔄 检测到新版本:", v.version);
+      localStorage.setItem(APP_VERSION_KEY, v.version);
+      
+      // 更新 Service Worker
+      if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage("update");
+        navigator.serviceWorker.register("sw.js").then(reg => {
+          if (reg.waiting) {
+            reg.waiting.postMessage("skipWaiting");
+            window.location.reload();
+          }
+        });
+      }
+    }
+  } catch(e) {
+    // 忽略错误
+  }
+}
+
+// 加载共享数据时使用时间戳避免缓存
+const origLoadSharedData = loadSharedData;
+loadSharedData = async function() {
+  try {
+    const resp = await fetch("dishes-shared.json?_t=" + Date.now());
+    if (!resp.ok) return;
+    const shared = await resp.json();
+    if (!Array.isArray(shared)) return;
+    
+    shared.forEach(s => {
+      const dish = dishes.find(d => d.id === s.id || d.name === s.name);
+      if (dish && s.image) {
+        dish.image = s.image;
+      }
+    });
+    
+    renderCategories();
+    console.log("✅ 已加载共享菜品图片（新）");
+  } catch(e) {
+    console.log("ℹ️ 未找到共享数据，使用默认Emoji");
+  }
+};
+
+// 定期检查更新（每60秒）
+checkForUpdate();
+setInterval(checkForUpdate, 60000);

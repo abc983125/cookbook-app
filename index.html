@@ -8,7 +8,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="assets/icon-192.png">
 <title>姐姐的小膳坊 🍳</title>
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 <div class="top-bar"></div>
@@ -348,13 +348,30 @@
 <div class="particles" id="particles"></div>
 <div class="confetti-wrap" id="confettiWrap"></div>
 
-<script src="js/dishes.js?v=4"></script>
-<script src="js/app.js?v=5"></script>
+<script src="js/dishes.js?v=5"></script>
+<script src="js/app.js?v=6"></script>
 <script>
-if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+if("serviceWorker" in navigator){
+  navigator.serviceWorker.register("sw.js", {updateViaCache: "none"}).then(reg => {
+    reg.addEventListener("updatefound", () => {
+      const sw = reg.installing;
+      sw.addEventListener("statechange", () => {
+        if (sw.state === "installed" && navigator.serviceWorker.controller) {
+          sw.postMessage("skipWaiting");
+          setTimeout(() => window.location.reload(), 500);
+        }
+      });
+    });
+  }).catch(()=>{});
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!refreshing) { refreshing = true; window.location.reload(); }
+  });
+}
 </script>
 </body>
 </html>
+
 
 
 
