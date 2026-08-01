@@ -349,16 +349,19 @@
 <div class="confetti-wrap" id="confettiWrap"></div>
 
 <script src="js/dishes.js?v=5"></script>
-<script src="js/app.js?v=6"></script>
+<script src="js/app.js?v=7"></script>
 <script>
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js", {updateViaCache: "none"}).then(reg => {
+    if (reg.active && !navigator.serviceWorker.controller) {
+      window.location.reload();
+    }
     reg.addEventListener("updatefound", () => {
-      const sw = reg.installing;
+      const sw = reg.installing || reg.waiting;
+      if (!sw) return;
       sw.addEventListener("statechange", () => {
         if (sw.state === "installed" && navigator.serviceWorker.controller) {
           sw.postMessage("skipWaiting");
-          setTimeout(() => window.location.reload(), 500);
         }
       });
     });
@@ -371,6 +374,7 @@ if("serviceWorker" in navigator){
 </script>
 </body>
 </html>
+
 
 
 

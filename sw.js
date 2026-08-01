@@ -1,5 +1,5 @@
-﻿const CACHE = "xs-v2";
-const VERSION = "2.0.0";
+﻿const CACHE = "xs-v3";
+const VERSION = "2.1.0";
 const URLS = ["index.html","manifest.json","css/style.css","js/app.js","js/dishes.js","version.json"];
 
 self.addEventListener("install", e => {
@@ -20,8 +20,24 @@ self.addEventListener("activate", e => {
   );
 });
 
+self.addEventListener("message", e => {
+  if (e.data === "skipWaiting" || e.data === "update") {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener("fetch", e => {
+  if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response("离线中", {status: 503})))
+    caches.match(e.request).then(cached => {
+      const network = fetch(e.request).then(resp => {
+        if (resp && resp.ok) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return resp;
+      }).catch(() => cached);
+      return cached || network;
+    })
   );
 });

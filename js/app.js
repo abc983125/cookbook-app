@@ -453,7 +453,7 @@ loadSharedData();
 
 // ===== 自动版本检测 & 实时更新 =====
 const APP_VERSION_KEY = "xs_app_version";
-const CURRENT_VERSION = "2.0.0";
+const CURRENT_VERSION = "2.1.0";
 
 async function checkForUpdate() {
   try {
@@ -506,3 +506,4 @@ loadSharedData = async function() {
 // 定期检查更新（每60秒）
 checkForUpdate();
 setInterval(checkForUpdate, 60000);
+
